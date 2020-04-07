@@ -1,0 +1,82 @@
+version: '3'
+services:
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper-1
+    ports:
+      - ${ZOOKEEPER_CLIENT_PORT_1}:${ZOOKEEPER_CLIENT_PORT_1}
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT_1}
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-1:12888:13888;zookeeper-2:22888:23888;zookeeper-3:32888:33888
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper-2
+    ports:
+      - ${ZOOKEEPER_CLIENT_PORT_2}:${ZOOKEEPER_CLIENT_PORT_2}
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT_2}
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-1:12888:13888;zookeeper-2:22888:23888;zookeeper-3:32888:33888
+
+  zookeeper-3:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper-3
+    ports:
+      - ${ZOOKEEPER_CLIENT_PORT_3}:${ZOOKEEPER_CLIENT_PORT_3}
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT_3}
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-1:12888:13888;zookeeper-2:22888:23888;zookeeper-3:32888:33888 #Local
+      
+  kafka-1:
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka-1
+    ports:
+      - ${KAFKA_PORT_1}:${KAFKA_PORT_1}
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:${ZOOKEEPER_CLIENT_PORT_1},zookeeper-2:${ZOOKEEPER_CLIENT_PORT_1},zookeeper-3:${ZOOKEEPER_CLIENT_PORT_1}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:${KAFKA_PORT_1}
+ 
+  kafka-2:
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka-2
+    ports:
+      - ${KAFKA_PORT_2}:${KAFKA_PORT_2}
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:${ZOOKEEPER_CLIENT_PORT_1},zookeeper-2:${ZOOKEEPER_CLIENT_PORT_1},zookeeper-3:${ZOOKEEPER_CLIENT_PORT_1}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:${KAFKA_PORT_2}
+ 
+  kafka-3:
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka-3
+    ports:
+      - ${KAFKA_PORT_3}:${KAFKA_PORT_3}
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:${ZOOKEEPER_CLIENT_PORT_1},zookeeper-2:${ZOOKEEPER_CLIENT_PORT_1},zookeeper-3:${ZOOKEEPER_CLIENT_PORT_1}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:${KAFKA_PORT_3}
